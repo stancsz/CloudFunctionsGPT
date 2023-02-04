@@ -24,8 +24,9 @@ def completions(prompt=""):
     return response
 
 @functions_framework.http
-def get_price_targets(request):
+def cf_gpt(request):
     """HTTP Cloud Function.
+    gcloud functions deploy cf-gpt --source=$(pwd) --trigger-http --runtime=python310 --allow-unauthenticated --gen2 --region=us-central1 --entry-point=cf_gpt --set-env-vars OPENAI_API_KEY=key
     """
     # Get the request JSON object
     request_json = request.get_json(silent=True)
@@ -34,9 +35,10 @@ def get_price_targets(request):
     # Check if the request contains a prompt
     if request_json and 'prompt' in request_json:
         prompt = request_json['prompt']
+        response = completions(prompt)
     else:
         # Return a bad request status code if prompt is not provided
         return 400
 
     # Return the completions for the given prompt as a JSON object
-    return json.dumps(completions(prompt))
+    return json.dumps(response)
