@@ -6,6 +6,7 @@ import openai
 # Set the OpenAI API key to the value of the environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+
 def completions(prompt=""):
     """
     Get completions from OpenAI API for given prompt
@@ -23,13 +24,14 @@ def completions(prompt=""):
     # Return the completions
     return response
 
+
 @functions_framework.http
 def cf_gpt(request):
     """HTTP Cloud Function.
     example deployment command:
     gcloud functions deploy cf-gpt --source=$(pwd) --trigger-http --runtime=python310 --allow-unauthenticated --gen2 --region=us-central1 --entry-point=cf_gpt --set-env-vars OPENAI_API_KEY={your_key}
     """
-    # Set CORS headers for the preflight request
+    # Set CORS headers for the preflight request https://cloud.google.com/functions/docs/samples/functions-http-cors
     if request.method == 'OPTIONS':
         # Allows GET requests from any origin with the Content-Type
         # header and caches preflight response for an 3600s
@@ -51,13 +53,14 @@ def cf_gpt(request):
     # request_args = request.args
 
     # Check if the request contains a prompt
-    if request_json and 'prompt' in request_json:
+    # if request_json and 'prompt' in request_json:
+    try:
         prompt = request_json['prompt']
-        response = completions(prompt)
-    else:
+        response = completions('Reply in Chinese. Be verbose. prompt is: ' + prompt)
+    # else:
+    except Exception as e:
         # Return a bad request status code if prompt is not provided
-        return ('Error no request_json or prompt', 400, headers)
+        return (e, 400, headers)
 
     # Return the completions for the given prompt as a JSON object
     return (json.dumps(response), 200, headers)
-
