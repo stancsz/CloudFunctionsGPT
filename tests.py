@@ -7,7 +7,7 @@ class Test(TestCase):
         prompt = 'how to make a pancake'
         data = {'prompt': prompt}
         req = Mock(get_json=Mock(return_value=data), args=data)
-        res = main.cf_gpt(req)
+        res = main.model_basic(req)
         print(res)
         # Call tested function
         assert req
